@@ -1,0 +1,1007 @@
+<!DOCTYPE html>
+<html lang="id" class="scroll-smooth">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Portofolio Digital Interaktif</title>
+  <script src="https://cdn.tailwindcss.com"></script>
+  <style>
+    body {
+      background-color: #0b0f19;
+      color: #f8fafc;
+      font-family: system-ui, -apple-system, sans-serif;
+    }
+    .card-hover {
+      transition: transform 0.25s ease, box-shadow 0.25s ease, border-color 0.25s ease;
+    }
+    .card-hover:hover {
+      transform: translateY(-4px);
+      box-shadow: 0 12px 24px -8px rgba(79, 70, 229, 0.25);
+      border-color: rgba(99, 102, 241, 0.4);
+    }
+    /* Indikator saat Mode Edit Langsung aktif */
+    .editable-active [data-editable="true"] {
+      outline: 2px dashed #6366f1;
+      outline-offset: 4px;
+      border-radius: 6px;
+      cursor: text;
+      background-color: rgba(99, 102, 241, 0.08);
+    }
+    .editable-active [data-editable="true"]:focus {
+      outline: 2px solid #818cf8;
+      background-color: rgba(30, 41, 59, 0.9);
+    }
+  </style>
+</head>
+<body class="min-h-screen flex flex-col selection:bg-indigo-500 selection:text-white">
+
+  <!-- Navbar -->
+  <header class="sticky top-0 z-30 bg-slate-950/85 backdrop-blur-md border-b border-slate-800/80">
+    <div class="max-w-6xl mx-auto px-6 py-4 flex flex-wrap justify-between items-center gap-3">
+      <!-- Username / Brand (Bisa diedit) -->
+      <a href="#" id="navBrand" data-editable="true" class="text-xl font-extrabold tracking-tight text-indigo-400">
+        ALIFIANSYAH.
+      </a>
+
+      <nav class="hidden md:flex items-center gap-6 text-sm text-slate-300">
+        <a href="#tentang" class="hover:text-white transition">Tentang Saya</a>
+        <a href="#keahlian" class="hover:text-white transition">Keahlian</a>
+        <a href="#pendidikan" class="hover:text-white transition">Pendidikan</a>
+        <a href="#galeri" class="hover:text-white transition">Galeri Karya</a>
+        <a href="#kontak" class="hover:text-white transition">Kontak</a>
+      </nav>
+
+      <div class="flex items-center gap-2">
+        <!-- Tombol Mode Edit Langsung -->
+        <button onclick="toggleDirectEdit()" id="directEditBtn" class="text-xs bg-slate-800 hover:bg-slate-700 text-slate-200 border border-slate-700 px-3 py-2 rounded-lg transition flex items-center gap-1.5">
+          <span>✏️ Edit Teks Langsung</span>
+        </button>
+
+        <!-- Tombol Edit via Form -->
+        <button onclick="openProfileModal()" class="text-xs bg-slate-800 hover:bg-slate-700 text-indigo-400 border border-indigo-500/30 px-3 py-2 rounded-lg transition">
+          ⚙️ Edit Profil
+        </button>
+
+        <!-- Tombol Upload -->
+        <button onclick="openUploadModal()" class="bg-indigo-600 hover:bg-indigo-500 text-white text-xs sm:text-sm font-medium px-4 py-2 rounded-lg transition">
+          + Upload Karya
+        </button>
+      </div>
+    </div>
+  </header>
+
+  <!-- Banner Notifikasi Mode Edit -->
+  <div id="editBanner" class="hidden bg-indigo-600 text-white text-xs py-2 px-4 text-center font-medium">
+    Mode Edit Langsung Aktif! Klik pada teks mana saja yang bergaris putus-putus (Nama, Username, Bio, atau Keahlian) untuk mengetik perubahan, lalu klik tombol <strong>"Selesai Edit"</strong> di kanan atas.
+  </div>
+
+  <!-- Hero & About Me Section -->
+  <section id="tentang" class="max-w-6xl mx-auto px-6 py-16 md:py-20">
+    <div class="grid grid-cols-1 md:grid-cols-12 gap-10 items-center">
+      <!-- Foto Profil -->
+      <div class="md:col-span-4 flex flex-col items-center">
+        <div class="relative group w-48 h-48 md:w-56 md:h-56 rounded-2xl overflow-hidden border-2 border-indigo-500/40 bg-slate-900 shadow-2xl">
+          <img id="profileImage" src="https://images.unsplash.com/photo-1534528741775-53994a69daeb?auto=format&fit=crop&w=600&q=80" alt="Foto Profil" class="w-full h-full object-cover" />
+          <label for="avatarUpload" class="absolute inset-0 bg-black/70 opacity-0 group-hover:opacity-100 transition flex flex-col items-center justify-center cursor-pointer text-xs font-medium text-white p-2 text-center">
+            <span class="bg-indigo-600 px-3 py-1.5 rounded-lg mb-1">📷 Ganti Foto</span>
+            <span class="text-[11px] text-slate-300">Klik untuk pilih foto dari laptop</span>
+            <input type="file" id="avatarUpload" accept="image/*" class="hidden" onchange="updateAvatar(event)" />
+          </label>
+        </div>
+        <div class="flex gap-2 mt-4">
+          <label for="avatarUpload" class="cursor-pointer text-xs text-slate-300 hover:text-white bg-slate-800 border border-slate-700 px-3 py-1.5 rounded-lg transition">
+            Ganti Foto
+          </label>
+          <button onclick="openProfileModal()" class="text-xs text-indigo-400 hover:text-indigo-300 border border-indigo-500/30 bg-indigo-500/10 px-3 py-1.5 rounded-lg transition">
+            Ubah Username & Biodata
+          </button>
+        </div>
+      </div>
+
+      <!-- Deskripsi Profil -->
+      <div class="md:col-span-8 text-center md:text-left">
+        <span id="profileLocation" data-editable="true" class="inline-block px-3 py-1 text-xs font-medium bg-indigo-500/10 text-indigo-400 border border-indigo-500/20 rounded-full mb-3">
+          Bekasi, Jawa Barat
+        </span>
+        <h1 id="profileName" data-editable="true" class="text-3xl md:text-5xl font-extrabold tracking-tight text-white mb-2">
+          Alifiansyah Yahya
+        </h1>
+        <p id="profileRole" data-editable="true" class="text-lg md:text-xl font-medium text-indigo-400 mb-4">
+          System Designer, Visual Storyteller & AI Enthusiast
+        </p>
+        <p id="profileBio" data-editable="true" class="text-slate-400 text-sm md:text-base leading-relaxed mb-6 max-w-2xl">
+          Berfokus pada perancangan antarmuka sistem informasi (UI/UX), pengembangan konsep cerita visual & animasi 3D, serta pemanfaatan teknologi Artificial Intelligence untuk efisiensi kerja dan proyek kreatif.
+        </p>
+        <div class="flex flex-wrap justify-center md:justify-start gap-3">
+          <a href="#galeri" class="bg-indigo-600 hover:bg-indigo-500 text-white font-medium px-6 py-2.5 rounded-lg text-sm transition">
+            Lihat Galeri Karya
+          </a>
+          <button onclick="openUploadModal()" class="bg-slate-800 hover:bg-slate-700 text-white font-medium px-6 py-2.5 rounded-lg text-sm border border-slate-700 transition">
+            + Upload Video / Foto
+          </button>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- Keahlian (Skills) Section -->
+  <section id="keahlian" class="bg-slate-900/40 border-y border-slate-800/80 py-16">
+    <div class="max-w-6xl mx-auto px-6">
+      <div class="text-center mb-10">
+        <h2 data-editable="true" id="skillHeading" class="text-2xl md:text-3xl font-bold text-white">Keahlian & Fokus Utama</h2>
+        <p data-editable="true" id="skillSubheading" class="text-slate-400 text-sm mt-2">Kombinasi kemampuan teknis, perancangan sistem, dan produksi kreatif</p>
+      </div>
+
+      <div class="grid grid-cols-1 md:grid-cols-3 gap-6">
+        <div class="bg-slate-900 border border-slate-800 p-6 rounded-xl card-hover">
+          <div class="w-10 h-10 rounded-lg bg-indigo-500/10 border border-indigo-500/20 flex items-center justify-center text-indigo-400 font-bold mb-4">
+            01
+          </div>
+          <h3 id="skill1Title" data-editable="true" class="text-lg font-semibold text-white mb-2">UI/UX & Arsitektur Sistem</h3>
+          <p id="skill1Desc" data-editable="true" class="text-xs text-slate-400 leading-relaxed mb-4">
+            Perancangan wireframe aplikasi, alur sistem informasi (CRUD), dan tata letak antarmuka web yang intuitif.
+          </p>
+        </div>
+
+        <div class="bg-slate-900 border border-slate-800 p-6 rounded-xl card-hover">
+          <div class="w-10 h-10 rounded-lg bg-emerald-500/10 border border-emerald-500/20 flex items-center justify-center text-emerald-400 font-bold mb-4">
+            02
+          </div>
+          <h3 id="skill2Title" data-editable="true" class="text-lg font-semibold text-white mb-2">Kreasi Visual & Animasi 3D</h3>
+          <p id="skill2Desc" data-editable="true" class="text-xs text-slate-400 leading-relaxed mb-4">
+            Pengembangan konsep storytelling sinematik, visualisasi animasi pendek 3D, serta produksi konten foto dan video.
+          </p>
+        </div>
+
+        <div class="bg-slate-900 border border-slate-800 p-6 rounded-xl card-hover">
+          <div class="w-10 h-10 rounded-lg bg-emerald-500/10 border border-emerald-500/20 flex items-center justify-center text-emerald-400 font-bold mb-4">
+            03
+          </div>
+          <h3 id="skill2Title" data-editable="true" class="text-lg font-semibold text-white mb-2">Kreasi Visual & Animasi 3D</h3>
+          <p id="skill3Desc" data-editable="true" class="text-xs text-slate-400 leading-relaxed mb-4">
+            Pengembangan konsep storytelling sinematik, visualisasi animasi pendek 3D, serta produksi konten foto dan video.
+          </p>
+        </div>
+
+        <div class="bg-slate-900 border border-slate-800 p-6 rounded-xl card-hover">
+          <div class="w-10 h-10 rounded-lg bg-amber-500/10 border border-amber-500/20 flex items-center justify-center text-amber-400 font-bold mb-4">
+            04
+          </div>
+          <h3 id="skill3Title" data-editable="true" class="text-lg font-semibold text-white mb-2">Implementasi AI & Data</h3>
+          <p id="skill4Desc" data-editable="true" class="text-xs text-slate-400 leading-relaxed mb-4">
+            Pemanfaatan Generative AI untuk otomasi alur kerja, prompt engineering, serta pengolahan data terstruktur.
+          </p>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- Pendidikan & Sertifikat Section -->
+  <section id="pendidikan" class="bg-slate-900/40 border-y border-slate-800/80 py-16">
+    <div class="max-w-6xl mx-auto px-6">
+      <div class="grid grid-cols-1 md:grid-cols-12 gap-10">
+        
+        <!-- Riwayat Pendidikan (SMA) -->
+        <div class="md:col-span-5">
+          <h2 class="text-2xl font-bold text-white mb-6 flex items-center gap-2">
+            <span>🎓</span> Riwayat Pendidikan
+          </h2>
+          <div class="bg-slate-900 border border-slate-800 p-6 rounded-xl card-hover space-y-3">
+            <div class="flex justify-between items-center">
+              <span id="eduYear" data-editable="true" class="text-xs bg-indigo-500/10 text-indigo-400 border border-indigo-500/20 px-2.5 py-1 rounded-full font-medium">2020 - 2023</span>
+              <span class="text-xs text-slate-500">SMA</span>
+            </div>
+            <h3 id="eduSchool" data-editable="true" class="text-lg font-bold text-white">SMA Negeri ...</h3>
+            <p id="eduMajor" data-editable="true" class="text-xs text-slate-400 leading-relaxed">
+              Jurusan MIPA / IPS — Aktif mengikuti kegiatan akademik dan pengembangan proyek kreatif.
+            </p>
+          </div>
+        </div>
+
+        <!-- Sertifikat & Pelatihan -->
+        <div class="md:col-span-7">
+          <div class="flex flex-wrap justify-between items-center mb-6 gap-2">
+            <h2 class="text-2xl font-bold text-white flex items-center gap-2">
+              <span>🏆</span> Sertifikat & Pelatihan
+            </h2>
+            <button onclick="openCertModal()" class="bg-indigo-600 hover:bg-indigo-500 text-white text-xs font-medium px-3.5 py-2 rounded-lg transition flex items-center gap-1.5">
+              <span>+ Tambah Sertifikat</span>
+            </button>
+          </div>
+
+          <!-- Empty State Sertifikat -->
+          <div id="certEmpty" class="hidden text-center py-8 bg-slate-900 border border-dashed border-slate-800 rounded-xl">
+            <p class="text-slate-400 text-xs mb-2">Belum ada sertifikat yang diunggah.</p>
+            <button onclick="openCertModal()" class="text-indigo-400 text-xs underline">Upload sertifikat pertama Anda</button>
+          </div>
+
+          <!-- Grid Sertifikat -->
+          <div id="certGrid" class="grid grid-cols-1 sm:grid-cols-2 gap-4"></div>
+        </div>
+
+      </div>
+    </div>
+  </section>
+
+  <!-- Galeri Section -->
+  <main id="galeri" class="max-w-6xl mx-auto px-6 py-16 flex-1 w-full">
+    <div class="flex flex-col md:flex-row md:items-end justify-between mb-8 gap-4">
+      <div>
+        <h2 class="text-2xl md:text-3xl font-bold text-white">Galeri Foto & Video</h2>
+        <p class="text-slate-400 text-sm mt-1">Klik pada video atau foto untuk memutar dalam layar penuh</p>
+      </div>
+
+      <!-- Filter Bar -->
+      <div class="flex items-center gap-2">
+        <button onclick="filterGallery('all')" id="btn-all" class="filter-btn bg-indigo-600 text-white px-4 py-1.5 rounded-lg text-sm font-medium transition">
+          Semua
+        </button>
+        <button onclick="filterGallery('image')" id="btn-image" class="filter-btn bg-slate-800 text-slate-300 hover:bg-slate-700 px-4 py-1.5 rounded-lg text-sm font-medium transition">
+          Foto
+        </button>
+        <button onclick="filterGallery('video')" id="btn-video" class="filter-btn bg-slate-800 text-slate-300 hover:bg-slate-700 px-4 py-1.5 rounded-lg text-sm font-medium transition">
+          Video
+        </button>
+      </div>
+    </div>
+
+    <div class="flex justify-between items-center mb-6 text-xs text-slate-400 border-b border-slate-800 pb-3">
+      <span id="itemCount">0 karya ditampilkan</span>
+      <button onclick="openUploadModal()" class="text-indigo-400 hover:text-indigo-300 font-medium">+ Upload Video / Foto Baru</button>
+    </div>
+
+    <!-- Empty State -->
+    <div id="emptyState" class="hidden text-center py-16 bg-slate-900/40 border border-dashed border-slate-800 rounded-2xl">
+      <p class="text-slate-400 mb-3 text-sm">Belum ada foto atau video di galeri ini.</p>
+      <button onclick="openUploadModal()" class="bg-indigo-600 hover:bg-indigo-500 text-white px-5 py-2.5 rounded-lg text-xs font-medium transition">
+        Upload Video / Foto Pertama Anda
+      </button>
+    </div>
+
+    <!-- Grid Container -->
+    <div id="galleryGrid" class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6"></div>
+  </main>
+
+<!-- Kontak & Sosial Media Section -->
+  <section id="kontak" class="bg-slate-900/60 border-t border-slate-800 py-16">
+    <div class="max-w-4xl mx-auto px-6 text-center">
+      <h2 class="text-2xl md:text-3xl font-bold text-white mb-3">Mari Berkolaborasi</h2>
+      <p class="text-slate-400 text-sm mb-8 max-w-lg mx-auto">
+        Hubungi saya melalui kanal berikut atau klik tombol dibawah ini
+
+      <div class="grid grid-cols-1 sm:grid-cols-2 gap-4 max-w-2xl mx-auto mb-6 text-left">
+        <!-- Email -->
+        <a id="linkEmail" href="mailto:alifiansyahyahyaa@gmail.com" class="bg-slate-900 hover:bg-slate-800 border border-slate-800 p-4 rounded-xl flex items-center gap-4 transition card-hover">
+          <span class="text-2xl bg-indigo-500/10 p-3 rounded-lg border border-indigo-500/20">✉️</span>
+          <div class="overflow-hidden">
+            <p class="text-xs text-slate-400">Email</p>
+            <p id="textEmail" class="text-sm font-semibold text-white truncate">alifiansyah@email.com</p>
+          </div>
+        </a>
+
+        <!-- WhatsApp / No HP -->
+        <a id="linkWhatsapp" href="https://wa.me/62895378845514" target="_blank" class="bg-slate-900 hover:bg-slate-800 border border-slate-800 p-4 rounded-xl flex items-center gap-4 transition card-hover">
+          <span class="text-2xl bg-emerald-500/10 p-3 rounded-lg border border-emerald-500/20">💬</span>
+          <div class="overflow-hidden">
+            <p class="text-xs text-slate-400">WhatsApp / No. HP</p>
+            <p id="textWa" class="text-sm font-semibold text-white truncate">+62 812-3456-7890</p>
+          </div>
+        </a>
+
+        <!-- Instagram -->
+        <a id="linkInstagram" href="https://www.instagram.com/balmuttttt?srtk=NGwzMXFzYWNrdzQ3" target="_blank" class="bg-slate-900 hover:bg-slate-800 border border-slate-800 p-4 rounded-xl flex items-center gap-4 transition card-hover">
+          <span class="text-2xl bg-pink-500/10 p-3 rounded-lg border border-pink-500/20">📸</span>
+          <div class="overflow-hidden">
+            <p class="text-xs text-slate-400">Instagram</p>
+            <p id="textIg" class="text-sm font-semibold text-white truncate">@alifiansyah</p>
+          </div>
+        </a>
+
+        <!-- LinkedIn -->
+        <a id="linkLinkedin" href="https://linkedin.com" target="_blank" class="bg-slate-900 hover:bg-slate-800 border border-slate-800 p-4 rounded-xl flex items-center gap-4 transition card-hover">
+          <span class="text-2xl bg-sky-500/10 p-3 rounded-lg border border-sky-500/20">💼</span>
+          <div class="overflow-hidden">
+            <p class="text-xs text-slate-400">LinkedIn</p>
+            <p id="textLi" class="text-sm font-semibold text-white truncate">Alifiansyah Yahya</p>
+          </div>
+        </a>
+      </div>
+
+      <button onclick="openProfileModal()" class="text-xs text-indigo-400 hover:text-indigo-300 border border-indigo-500/30 bg-indigo-500/10 px-4 py-2 rounded-lg transition">
+        ✏️ Ubah Data Kontak (Email, IG, No. HP)
+      </button>
+    </div>
+  </section>
+
+  <!-- Footer -->
+  <footer class="border-t border-slate-800/80 py-6 text-center text-xs text-slate-500">
+    &copy; 2026 <span id="footerName">Alifiansyah Yahya</span>. Portofolio Digital Interaktif.
+  </footer>
+
+  <!-- MODAL 1: Upload / Edit Foto & Video -->
+  <div id="uploadModal" class="fixed inset-0 z-50 hidden bg-black/75 backdrop-blur-sm flex items-center justify-center p-4">
+    <div class="bg-slate-900 border border-slate-800 rounded-2xl max-w-md w-full p-6 shadow-2xl">
+      <div class="flex justify-between items-center mb-5">
+        <h2 id="uploadModalTitle" class="text-lg font-bold text-white">Upload Foto / Video</h2>
+        <button onclick="closeUploadModal()" class="text-slate-400 hover:text-white text-xl">&times;</button>
+      </div>
+
+      <form id="uploadForm" class="space-y-4">
+        <input type="hidden" id="editItemId" value="" />
+        <div>
+          <label class="block text-xs font-medium text-slate-300 mb-1">Judul Karya</label>
+          <input type="text" id="mediaTitle" required placeholder="Contoh: Animasi 3D / Desain Sistem"
+            class="w-full bg-slate-800 border border-slate-700 rounded-lg px-3.5 py-2 text-sm text-white focus:outline-none focus:border-indigo-500" />
+        </div>
+
+        <div>
+          <label class="block text-xs font-medium text-slate-300 mb-1">Deskripsi Singkat</label>
+          <textarea id="mediaDesc" rows="2" placeholder="Ceritakan proses atau detail karya ini..."
+            class="w-full bg-slate-800 border border-slate-700 rounded-lg px-3.5 py-2 text-sm text-white focus:outline-none focus:border-indigo-500"></textarea>
+        </div>
+
+        <div>
+          <label id="fileInputLabel" class="block text-xs font-medium text-slate-300 mb-1">Pilih File Video (.mp4, .webm, .mov) atau Foto</label>
+          <input type="file" id="mediaFile" accept="image/*,video/*"
+            class="w-full text-sm text-slate-400 file:mr-4 file:py-2 file:px-4 file:rounded-lg file:border-0 file:text-sm file:font-medium file:bg-indigo-600 file:text-white hover:file:bg-indigo-500 cursor-pointer bg-slate-800 rounded-lg border border-slate-700" />
+          <p class="text-[11px] text-slate-500 mt-1">Mendukung foto (JPG, PNG, WEBP) dan video (MP4, MOV, MKV, WEBM).</p>
+        </div>
+
+        <div class="flex justify-end gap-3 pt-3">
+          <button type="button" onclick="closeUploadModal()" class="px-4 py-2 rounded-lg text-sm text-slate-300 hover:bg-slate-800 transition">
+            Batal
+          </button>
+          <button type="submit" id="submitBtn" class="bg-indigo-600 hover:bg-indigo-500 text-white px-5 py-2 rounded-lg text-sm font-medium transition">
+            Simpan ke Galeri
+          </button>
+        </div>
+      </form>
+    </div>
+  </div>
+
+  <!-- MODAL 2: Edit Username, Profil & Kontak (Bebas Validasi Ketat) -->
+  <div id="profileModal" class="fixed inset-0 z-50 hidden bg-black/75 backdrop-blur-sm flex items-center justify-center p-4">
+    <div class="bg-slate-900 border border-slate-800 rounded-2xl max-w-lg w-full p-6 shadow-2xl max-h-[90vh] overflow-y-auto">
+      <div class="flex justify-between items-center mb-4">
+        <h2 class="text-lg font-bold text-white">Edit Username, Profil & Kontak</h2>
+        <button onclick="closeProfileModal()" class="text-slate-400 hover:text-white text-xl">&times;</button>
+      </div>
+      <form id="profileForm" class="space-y-3.5">
+        <div class="grid grid-cols-1 sm:grid-cols-2 gap-3">
+          <div>
+            <label class="block text-xs text-indigo-400 font-medium mb-1">Username / Brand (Kiri Atas)</label>
+            <input type="text" id="inputBrand" placeholder="Contoh: ALIFIANSYAH." class="w-full bg-slate-800 border border-slate-700 rounded-lg px-3 py-2 text-sm text-white" />
+          </div>
+          <div>
+            <label class="block text-xs text-slate-300 font-medium mb-1">Nama Lengkap</label>
+            <input type="text" id="inputName" placeholder="Nama Anda" class="w-full bg-slate-800 border border-slate-700 rounded-lg px-3 py-2 text-sm text-white" />
+          </div>
+        </div>
+        <div>
+          <label class="block text-xs text-slate-400 mb-1">Headline / Keahlian Utama</label>
+          <input type="text" id="inputRole" class="w-full bg-slate-800 border border-slate-700 rounded-lg px-3 py-2 text-sm text-white" />
+        </div>
+        <div>
+          <label class="block text-xs text-slate-400 mb-1">Lokasi</label>
+          <input type="text" id="inputLocation" class="w-full bg-slate-800 border border-slate-700 rounded-lg px-3 py-2 text-sm text-white" />
+        </div>
+        <div>
+          <label class="block text-xs text-slate-400 mb-1">Tentang Saya (Bio)</label>
+          <textarea id="inputBio" rows="3" class="w-full bg-slate-800 border border-slate-700 rounded-lg px-3 py-2 text-sm text-white"></textarea>
+        </div>
+        <div class="grid grid-cols-1 sm:grid-cols-2 gap-3 pt-2 border-t border-slate-800">
+          <div>
+            <label class="block text-xs text-slate-400 mb-1">Alamat Email</label>
+            <input type="text" id="inputEmail" placeholder="nama@email.com" class="w-full bg-slate-800 border border-slate-700 rounded-lg px-3 py-2 text-sm text-white" />
+          </div>
+          <div>
+            <label class="block text-xs text-slate-400 mb-1">Nomor WhatsApp (Awali 62)</label>
+            <input type="text" id="inputWa" placeholder="628123456789" class="w-full bg-slate-800 border border-slate-700 rounded-lg px-3 py-2 text-sm text-white" />
+          </div>
+          <div>
+            <label class="block text-xs text-slate-400 mb-1">Username / Link Instagram</label>
+            <input type="text" id="inputIg" placeholder="@username atau link" class="w-full bg-slate-800 border border-slate-700 rounded-lg px-3 py-2 text-sm text-white" />
+          </div>
+          <div>
+            <label class="block text-xs text-slate-400 mb-1">Username / Link LinkedIn</label>
+            <input type="text" id="inputLi" placeholder="Nama LinkedIn atau link" class="w-full bg-slate-800 border border-slate-700 rounded-lg px-3 py-2 text-sm text-white" />
+          </div>
+        </div>
+        <div class="flex justify-end gap-3 pt-4">
+          <button type="button" onclick="closeProfileModal()" class="px-4 py-2 rounded-lg text-sm text-slate-300 hover:bg-slate-800">Batal</button>
+          <button type="submit" class="bg-indigo-600 hover:bg-indigo-500 text-white px-5 py-2 rounded-lg text-sm font-medium">Simpan Perubahan</button>
+        </div>
+      </form>
+    </div>
+  </div>
+
+  <!-- MODAL 3: Lightbox Preview Layar Penuh -->
+  <div id="lightboxModal" class="fixed inset-0 z-50 hidden bg-black/90 backdrop-blur-md flex items-center justify-center p-4">
+    <div class="max-w-4xl w-full relative">
+      <button onclick="closeLightbox()" class="absolute -top-10 right-0 text-slate-300 hover:text-white text-lg font-bold">&times; Tutup</button>
+      <div id="lightboxContent" class="bg-slate-900 rounded-xl overflow-hidden border border-slate-800"></div>
+    </div>
+  </div>
+
+  <!-- MODAL: Tambah Sertifikat -->
+  <div id="certModal" class="fixed inset-0 z-50 hidden bg-black/75 backdrop-blur-sm flex items-center justify-center p-4">
+    <div class="bg-slate-900 border border-slate-800 rounded-2xl max-w-md w-full p-6 shadow-2xl">
+      <div class="flex justify-between items-center mb-5">
+        <h2 class="text-lg font-bold text-white">Tambah Sertifikat / Pelatihan</h2>
+        <button onclick="closeCertModal()" class="text-slate-400 hover:text-white text-xl">&times;</button>
+      </div>
+
+      <form id="certForm" class="space-y-4">
+        <div>
+          <label class="block text-xs font-medium text-slate-300 mb-1">Nama Sertifikat / Pelatihan</label>
+          <input type="text" id="certTitle" required placeholder="Contoh: Kursus Excel & AI"
+            class="w-full bg-slate-800 border border-slate-700 rounded-lg px-3.5 py-2 text-sm text-white focus:outline-none focus:border-indigo-500" />
+        </div>
+
+        <div>
+          <label class="block text-xs font-medium text-slate-300 mb-1">Penerbit / Lembaga</label>
+          <input type="text" id="certIssuer" required placeholder="Contoh: Dicoding / Microsoft / Kampus"
+            class="w-full bg-slate-800 border border-slate-700 rounded-lg px-3.5 py-2 text-sm text-white focus:outline-none focus:border-indigo-500" />
+        </div>
+
+        <div>
+          <label class="block text-xs font-medium text-slate-300 mb-1">Tahun Perolehan</label>
+          <input type="text" id="certYear" required placeholder="Contoh: 2026"
+            class="w-full bg-slate-800 border border-slate-700 rounded-lg px-3.5 py-2 text-sm text-white focus:outline-none focus:border-indigo-500" />
+        </div>
+
+        <div>
+          <label class="block text-xs font-medium text-slate-300 mb-1">Upload Gambar Sertifikat</label>
+          <<input type="file" id="certFile" accept="image/*,application/pdf" required
+  class="w-full text-sm text-slate-400 file:mr-4 file:py-2 file:px-4 file:rounded-lg file:border-0 file:text-sm file:font-medium file:bg-indigo-600 file:text-white hover:file:bg-indigo-500 cursor-pointer bg-slate-800 rounded-lg border border-slate-700" />
+
+        <div class="flex justify-end gap-3 pt-3">
+          <button type="button" onclick="closeCertModal()" class="px-4 py-2 rounded-lg text-sm text-slate-300 hover:bg-slate-800 transition">Batal</button>
+          <button type="submit" class="bg-indigo-600 hover:bg-indigo-500 text-white px-5 py-2 rounded-lg text-sm font-medium transition">Simpan Sertifikat</button>
+        </div>
+      </form>
+    </div>
+  </div>
+
+  <!-- Script Utama -->
+  <script>
+    let db = null;
+    let currentFilter = 'all';
+    let mediaItems = [];
+    let isDirectEdit = false;
+
+    // 1. Sistem Penyimpanan Aman (Tetap Jalan Meskipun Dibuka Tanpa Server)
+    const memoryStorage = {};
+    function safeSetItem(key, value) {
+      try {
+        localStorage.setItem(key, value);
+      } catch (e) {
+        memoryStorage[key] = value;
+      }
+    }
+    function safeGetItem(key) {
+      try {
+        return localStorage.getItem(key) || memoryStorage[key] || null;
+      } catch (e) {
+        return memoryStorage[key] || null;
+      }
+    }
+
+    // 2. Data Default Profil
+    const defaultProfile = {
+      brand: 'ALIFIANSYAH.',
+      name: 'Alifiansyah Yahya',
+      role: 'System Designer, Visual Storyteller & AI Enthusiast',
+      location: 'Bekasi, Jawa Barat',
+      bio: 'Berfokus pada perancangan antarmuka sistem informasi (UI/UX), pengembangan konsep cerita visual & animasi 3D, serta pemanfaatan teknologi Artificial Intelligence untuk efisiensi kerja dan proyek kreatif.',
+      email: 'alifiansyah@email.com',
+      wa: '6281234567890',
+      ig: 'https://instagram.com',
+      li: 'https://linkedin.com',
+      avatar: 'https://images.unsplash.com/photo-1534528741775-53994a69daeb?auto=format&fit=crop&w=600&q=80',
+      skill1Title: 'UI/UX & Arsitektur Sistem',
+      skill1Desc: 'Perancangan wireframe aplikasi, alur sistem informasi (CRUD), dan tata letak antarmuka web yang intuitif.',
+      skill2Title: 'Kreasi Visual & Animasi 3D',
+      skill2Desc: 'Pengembangan konsep storytelling sinematik, visualisasi animasi pendek 3D, serta produksi konten foto dan video.',
+      skill3Title: 'Implementasi AI & Data',
+      skill3Desc: 'Pemanfaatan Generative AI untuk otomasi alur kerja, prompt engineering, serta pengolahan data terstruktur.'
+    };
+
+    function getSavedProfile() {
+      const raw = safeGetItem('portfolio_profile_v3');
+      if (!raw) return { ...defaultProfile };
+      try {
+        return { ...defaultProfile, ...JSON.parse(raw) };
+      } catch (e) {
+        return { ...defaultProfile };
+      }
+    }
+
+    function loadProfile() {
+      const saved = getSavedProfile();
+      document.getElementById('navBrand').textContent = saved.brand;
+      document.getElementById('profileName').textContent = saved.name;
+      document.getElementById('footerName').textContent = saved.name;
+      document.getElementById('profileRole').textContent = saved.role;
+      document.getElementById('profileLocation').textContent = saved.location;
+      document.getElementById('profileBio').textContent = saved.bio;
+      document.getElementById('profileImage').src = saved.avatar || defaultProfile.avatar;
+
+      document.getElementById('skill1Title').textContent = saved.skill1Title;
+      document.getElementById('skill1Desc').textContent = saved.skill1Desc;
+      document.getElementById('skill2Title').textContent = saved.skill2Title;
+      document.getElementById('skill2Desc').textContent = saved.skill2Desc;
+      document.getElementById('skill3Title').textContent = saved.skill3Title;
+      document.getElementById('skill3Desc').textContent = saved.skill3Desc;
+
+      // Format Link Otomatis jika pengguna hanya mengetik @username
+      const igLink = saved.ig.startsWith('http') ? saved.ig : `https://instagram.com/${saved.ig.replace('@', '')}`;
+      const liLink = saved.li.startsWith('http') ? saved.li : `https://linkedin.com/in/${saved.li}`;
+      const cleanWa = saved.wa.replace(/[^0-9]/g, '');
+
+      document.getElementById('linkEmail').href = `mailto:${saved.email}`;
+      document.getElementById('linkWhatsapp').href = `https://wa.me/${cleanWa}`;
+      document.getElementById('linkInstagram').href = igLink;
+      document.getElementById('linkLinkedin').href = liLink;
+      document.getElementById('linkEmail').href = `mailto:${saved.email}`;
+      document.getElementById('linkWhatsapp').href = `https://wa.me/${cleanWa}`;
+      document.getElementById('linkInstagram').href = igLink;
+      document.getElementById('linkLinkedin').href = liLink;
+
+      // Menampilkan teks Email, No HP, dan Username IG di kartu kontak
+      if (document.getElementById('textEmail')) document.getElementById('textEmail').textContent = saved.email;
+      if (document.getElementById('textWa')) document.getElementById('textWa').textContent = saved.wa;
+      if (document.getElementById('textIg')) document.getElementById('textIg').textContent = saved.ig;
+      if (document.getElementById('textLi')) document.getElementById('textLi').textContent = saved.li;
+    }
+
+    // 3. Fitur Mode Edit Teks Langsung di Halaman
+    function toggleDirectEdit() {
+      isDirectEdit = !isDirectEdit;
+      const btn = document.getElementById('directEditBtn');
+      const banner = document.getElementById('editBanner');
+      const editables = document.querySelectorAll('[data-editable="true"]');
+
+      if (isDirectEdit) {
+        document.body.classList.add('editable-active');
+        banner.classList.remove('hidden');
+        btn.innerHTML = '<span>✅ Selesai Edit</span>';
+        btn.className = 'text-xs bg-emerald-600 hover:bg-emerald-500 text-white px-3 py-2 rounded-lg transition font-medium';
+        editables.forEach(el => el.setAttribute('contenteditable', 'true'));
+      } else {
+        document.body.classList.remove('editable-active');
+        banner.classList.add('hidden');
+        btn.innerHTML = '<span>✏️ Edit Teks Langsung</span>';
+        btn.className = 'text-xs bg-slate-800 hover:bg-slate-700 text-slate-200 border border-slate-700 px-3 py-2 rounded-lg transition';
+        editables.forEach(el => el.removeAttribute('contenteditable'));
+
+        // Simpan semua teks yang diedit langsung
+        const current = getSavedProfile();
+        current.brand = document.getElementById('navBrand').textContent.trim();
+        current.name = document.getElementById('profileName').textContent.trim();
+        current.role = document.getElementById('profileRole').textContent.trim();
+        current.location = document.getElementById('profileLocation').textContent.trim();
+        current.bio = document.getElementById('profileBio').textContent.trim();
+        current.skill1Title = document.getElementById('skill1Title').textContent.trim();
+        current.skill1Desc = document.getElementById('skill1Desc').textContent.trim();
+        current.skill2Title = document.getElementById('skill2Title').textContent.trim();
+        current.skill2Desc = document.getElementById('skill2Desc').textContent.trim();
+        current.skill3Title = document.getElementById('skill3Title').textContent.trim();
+        current.skill3Desc = document.getElementById('skill3Desc').textContent.trim();
+
+        safeSetItem('portfolio_profile_v3', JSON.stringify(current));
+        loadProfile();
+      }
+    }
+
+    // 4. Modal Edit Profil & Username
+    function openProfileModal() {
+      const saved = getSavedProfile();
+      document.getElementById('inputBrand').value = saved.brand;
+      document.getElementById('inputName').value = saved.name;
+      document.getElementById('inputRole').value = saved.role;
+      document.getElementById('inputLocation').value = saved.location;
+      document.getElementById('inputBio').value = saved.bio;
+      document.getElementById('inputEmail').value = saved.email;
+      document.getElementById('inputWa').value = saved.wa;
+      document.getElementById('inputIg').value = saved.ig;
+      document.getElementById('inputLi').value = saved.li;
+      document.getElementById('profileModal').classList.remove('hidden');
+    }
+
+    function closeProfileModal() {
+      document.getElementById('profileModal').classList.add('hidden');
+    }
+
+    document.getElementById('profileForm').addEventListener('submit', function(e) {
+      e.preventDefault();
+      const current = getSavedProfile();
+      const updated = {
+        ...current,
+        brand: document.getElementById('inputBrand').value.trim() || 'PORTOFOLIO.',
+        name: document.getElementById('inputName').value.trim() || 'Nama Anda',
+        role: document.getElementById('inputRole').value.trim(),
+        location: document.getElementById('inputLocation').value.trim(),
+        bio: document.getElementById('inputBio').value.trim(),
+        email: document.getElementById('inputEmail').value.trim(),
+        wa: document.getElementById('inputWa').value.trim(),
+        ig: document.getElementById('inputIg').value.trim(),
+        li: document.getElementById('inputLi').value.trim()
+      };
+      safeSetItem('portfolio_profile_v3', JSON.stringify(updated));
+      loadProfile();
+      closeProfileModal();
+    });
+
+    function updateAvatar(event) {
+      const file = event.target.files[0];
+      if (!file) return;
+      const reader = new FileReader();
+      reader.onload = function(e) {
+        const current = getSavedProfile();
+        current.avatar = e.target.result;
+        safeSetItem('portfolio_profile_v3', JSON.stringify(current));
+        document.getElementById('profileImage').src = e.target.result;
+      };
+      reader.readAsDataURL(file);
+    }
+
+    // 5. Sistem Database Video & Foto (Dengan Fallback Anti-Gagal)
+    function initIndexedDB() {
+      try {
+        const request = indexedDB.open('PortfolioGalleryDB', 2);
+        request.onupgradeneeded = function(e) {
+          const database = e.target.result;
+          if (!database.objectStoreNames.contains('media')) {
+            database.createObjectStore('media', { keyPath: 'id' });
+          }
+        };
+        request.onsuccess = function(e) {
+          db = e.target.result;
+          loadMediaFromLocal();
+        };
+        request.onerror = function() {
+          renderGallery();
+        };
+      } catch (err) {
+        renderGallery();
+      }
+    }
+
+    function loadMediaFromLocal() {
+      if (!db) {
+        renderGallery();
+        return;
+      }
+      try {
+        const tx = db.transaction('media', 'readonly');
+        const store = tx.objectStore('media');
+        const getAll = store.getAll();
+        getAll.onsuccess = function() {
+          const results = getAll.result || [];
+          mediaItems = results.sort((a, b) => b.id - a.id).map(item => ({
+            ...item,
+            url: item.fileBlob ? URL.createObjectURL(item.fileBlob) : item.url
+          }));
+          renderGallery();
+        };
+      } catch (err) {
+        renderGallery();
+      }
+    }
+
+    // 6. Handle Upload & Edit Karya (Video & Foto)
+    document.getElementById('uploadForm').addEventListener('submit', function(e) {
+      e.preventDefault();
+      const editId = document.getElementById('editItemId').value;
+      const title = document.getElementById('mediaTitle').value.trim();
+      const desc = document.getElementById('mediaDesc').value.trim();
+      const fileInput = document.getElementById('mediaFile');
+      const file = fileInput.files[0];
+
+      // Jika sedang mengedit karya yang sudah ada
+      if (editId) {
+        const numericId = Number(editId);
+        const index = mediaItems.findIndex(i => i.id === numericId);
+        if (index !== -1) {
+          mediaItems[index].title = title;
+          mediaItems[index].desc = desc;
+          if (file) {
+            const isVideo = file.type.startsWith('video/') || /\.(mp4|webm|ogg|mov|mkv)$/i.test(file.name);
+            mediaItems[index].type = isVideo ? 'video' : 'image';
+            mediaItems[index].fileBlob = file;
+            mediaItems[index].url = URL.createObjectURL(file);
+          }
+          saveItemToDB(mediaItems[index]);
+          renderGallery();
+        }
+        closeUploadModal();
+        return;
+      }
+
+      // Jika upload karya baru
+      if (!file) {
+        alert('Silakan pilih file video atau foto terlebih dahulu.');
+        return;
+      }
+
+      const isVideo = file.type.startsWith('video/') || /\.(mp4|webm|ogg|mov|mkv)$/i.test(file.name);
+      const newItem = {
+        id: Date.now(),
+        title,
+        desc,
+        type: isVideo ? 'video' : 'image',
+        fileBlob: file,
+        url: URL.createObjectURL(file),
+        createdAt: new Date().toLocaleDateString('id-ID', { day: 'numeric', month: 'short', year: 'numeric' })
+      };
+
+      // Tampilkan langsung di layar tanpa menunggu database
+      mediaItems.unshift(newItem);
+      renderGallery();
+
+      // Simpan ke IndexedDB di latar belakang
+      saveItemToDB(newItem);
+
+      document.getElementById('uploadForm').reset();
+      closeUploadModal();
+    });
+
+    function saveItemToDB(item) {
+      if (!db) return;
+      try {
+        const tx = db.transaction('media', 'readwrite');
+        tx.objectStore('media').put({
+          id: item.id,
+          title: item.title,
+          desc: item.desc,
+          type: item.type,
+          fileBlob: item.fileBlob,
+          createdAt: item.createdAt
+        });
+      } catch (e) {
+        console.warn('Info: File ditampilkan dari memori sesi browser.');
+      }
+    }
+
+    // 7. Render Galeri
+    function renderGallery() {
+      const grid = document.getElementById('galleryGrid');
+      const emptyState = document.getElementById('emptyState');
+      const itemCount = document.getElementById('itemCount');
+      grid.innerHTML = '';
+
+      const filtered = mediaItems.filter(item => currentFilter === 'all' || item.type === currentFilter);
+      itemCount.textContent = `${filtered.length} karya ditampilkan`;
+
+      if (filtered.length === 0) {
+        emptyState.classList.remove('hidden');
+        return;
+      }
+      emptyState.classList.add('hidden');
+
+      filtered.forEach(item => {
+        const card = document.createElement('div');
+        card.className = 'bg-slate-900 border border-slate-800 rounded-xl overflow-hidden card-hover flex flex-col';
+
+        const mediaPreview = item.type === 'video'
+          ? `<div class="relative aspect-video bg-black cursor-pointer group" onclick="openLightbox(${item.id})">
+               <video src="${item.url}" class="w-full h-full object-cover" preload="metadata" muted onmouseover="this.play()" onmouseout="this.pause();"></video>
+               <div class="absolute inset-0 bg-black/30 group-hover:bg-black/10 transition flex items-center justify-center">
+                 <span class="w-11 h-11 rounded-full bg-indigo-600/90 text-white flex items-center justify-center text-sm shadow-lg">▶</span>
+               </div>
+               <span class="absolute top-3 left-3 bg-indigo-600/90 text-white text-[10px] font-bold px-2 py-0.5 rounded uppercase">Video</span>
+             </div>`
+          : `<div class="relative aspect-video bg-slate-800 cursor-pointer" onclick="openLightbox(${item.id})">
+               <img src="${item.url}" alt="${item.title}" class="w-full h-full object-cover" />
+               <span class="absolute top-3 left-3 bg-emerald-600/90 text-white text-[10px] font-bold px-2 py-0.5 rounded uppercase">Foto</span>
+             </div>`;
+
+        card.innerHTML = `
+          ${mediaPreview}
+          <div class="p-4 flex-1 flex flex-col justify-between">
+            <div>
+              <h3 class="font-semibold text-white text-base mb-1 cursor-pointer hover:text-indigo-400" onclick="openLightbox(${item.id})">${item.title}</h3>
+              <p class="text-xs text-slate-400 line-clamp-2 mb-3">${item.desc || 'Tidak ada deskripsi.'}</p>
+            </div>
+            <div class="flex justify-between items-center pt-3 border-t border-slate-800/80 text-xs text-slate-500">
+              <span>${item.createdAt || ''}</span>
+              <div class="flex gap-3">
+                <button onclick="openEditItemModal(${item.id})" class="text-indigo-400 hover:text-indigo-300 font-medium">Edit</button>
+                <button onclick="deleteItem(${item.id})" class="text-rose-400 hover:text-rose-300 font-medium">Hapus</button>
+              </div>
+            </div>
+          </div>
+        `;
+        grid.appendChild(card);
+      });
+    }
+
+    function filterGallery(type) {
+      currentFilter = type;
+      document.querySelectorAll('.filter-btn').forEach(btn => {
+        btn.className = 'filter-btn bg-slate-800 text-slate-300 hover:bg-slate-700 px-4 py-1.5 rounded-lg text-sm font-medium transition';
+      });
+      document.getElementById(`btn-${type}`).className = 'filter-btn bg-indigo-600 text-white px-4 py-1.5 rounded-lg text-sm font-medium transition';
+      renderGallery();
+    }
+
+    function openEditItemModal(id) {
+      const item = mediaItems.find(i => i.id === id);
+      if (!item) return;
+      document.getElementById('uploadModalTitle').textContent = 'Edit Karya';
+      document.getElementById('editItemId').value = item.id;
+      document.getElementById('mediaTitle').value = item.title;
+      document.getElementById('mediaDesc').value = item.desc || '';
+      document.getElementById('fileInputLabel').textContent = 'Ganti File Video/Foto (Kosongkan jika tidak ingin diganti)';
+      document.getElementById('uploadModal').classList.remove('hidden');
+    }
+
+    function deleteItem(id) {
+      if (!confirm('Hapus karya ini dari galeri?')) return;
+      mediaItems = mediaItems.filter(i => i.id !== id);
+      renderGallery();
+      if (db) {
+        try {
+          const tx = db.transaction('media', 'readwrite');
+          tx.objectStore('media').delete(id);
+        } catch (e) {}
+      }
+    }
+
+    // 8. Lightbox & Upload Modal Controls
+    function openLightbox(id) {
+      const item = mediaItems.find(i => i.id === id);
+      if (!item) return;
+      const content = document.getElementById('lightboxContent');
+      const mediaTag = item.type === 'video'
+        ? `<video src="${item.url}" controls autoplay class="w-full max-h-[75vh] bg-black"></video>`
+        : `<img src="${item.url}" class="w-full max-h-[75vh] object-contain bg-black" />`;
+
+      content.innerHTML = `
+        ${mediaTag}
+        <div class="p-4">
+          <h3 class="text-lg font-bold text-white">${item.title}</h3>
+          <p class="text-sm text-slate-400 mt-1">${item.desc || ''}</p>
+        </div>
+      `;
+      document.getElementById('lightboxModal').classList.remove('hidden');
+    }
+
+    function closeLightbox() {
+      document.getElementById('lightboxContent').innerHTML = '';
+      document.getElementById('lightboxModal').classList.add('hidden');
+    }
+
+    function openUploadModal() {
+      document.getElementById('uploadForm').reset();
+      document.getElementById('editItemId').value = '';
+      document.getElementById('uploadModalTitle').textContent = 'Upload Foto / Video';
+      document.getElementById('fileInputLabel').textContent = 'Pilih File Video (.mp4, .webm, .mov) atau Foto';
+      document.getElementById('uploadModal').classList.remove('hidden');
+    }
+
+    function closeUploadModal() {
+      document.getElementById('uploadModal').classList.add('hidden');
+    }
+
+    // 1. Variabel dan Fungsi Penyimpanan Sertifikat
+    let certItems = [];
+
+    function openCertModal() { document.getElementById('certModal').classList.remove('hidden'); }
+    function closeCertModal() { document.getElementById('certModal').classList.add('hidden'); }
+
+    document.getElementById('certForm').addEventListener('submit', function(e) {
+      e.preventDefault();
+      const title = document.getElementById('certTitle').value.trim();
+      const issuer = document.getElementById('certIssuer').value.trim();
+      const year = document.getElementById('certYear').value.trim();
+      const file = document.getElementById('certFile').files[0];
+
+      if (!file) return;
+
+      const reader = new FileReader();
+      reader.onload = function(e) {
+        const newCert = {
+          id: Date.now(),
+          title,
+          issuer,
+          year,
+          url: e.target.result
+        };
+        certItems.unshift(newCert);
+        safeSetItem('portfolio_certs', JSON.stringify(certItems));
+        renderCertificates();
+        document.getElementById('certForm').reset();
+        closeCertModal();
+      };
+      reader.readAsDataURL(file);
+    });
+
+    function loadCertificates() {
+      const saved = safeGetItem('portfolio_certs');
+      if (saved) {
+        try { certItems = JSON.parse(saved); } catch(e) { certItems = []; }
+      }
+      renderCertificates();
+    }
+
+function renderCertificates() {
+      const grid = document.getElementById('certGrid');
+      const empty = document.getElementById('certEmpty');
+      if (!grid) return;
+      grid.innerHTML = '';
+
+      if (certItems.length === 0) {
+        if (empty) empty.classList.remove('hidden');
+        return;
+      }
+      if (empty) empty.classList.add('hidden');
+
+      certItems.forEach(cert => {
+        const isPdf = cert.type === 'pdf' || (cert.url && cert.url.startsWith('data:application/pdf'));
+        
+        // Tampilan pratinjau kartu (Jika PDF tampilkan ikon dokumen, jika gambar tampilkan foto)
+        const previewContent = isPdf
+          ? `<div class="w-full h-full flex flex-col items-center justify-center bg-slate-950 text-indigo-400 gap-2">
+               <span class="text-3xl">📄</span>
+               <span class="text-xs font-semibold text-slate-300">File Dokumen PDF</span>
+             </div>`
+          : `<img src="${cert.url}" alt="${cert.title}" class="w-full h-full object-cover group-hover:scale-105 transition duration-300" />`;
+
+        const card = document.createElement('div');
+        card.className = 'bg-slate-900 border border-slate-800 rounded-xl overflow-hidden card-hover flex flex-col';
+        card.innerHTML = `
+          <div class="aspect-video bg-slate-950 cursor-pointer overflow-hidden relative group" onclick="openLightboxCert('${cert.url}', '${cert.title}', ${isPdf})">
+            ${previewContent}
+            <div class="absolute inset-0 bg-black/40 opacity-0 group-hover:opacity-100 transition flex items-center justify-center text-xs text-white font-medium">Buka Sertifikat</div>
+          </div>
+          <div class="p-3.5 flex-1 flex flex-col justify-between">
+            <div>
+              <div class="flex justify-between items-start gap-2 mb-1">
+                <h4 class="text-sm font-semibold text-white line-clamp-1">${cert.title}</h4>
+                <span class="text-[10px] bg-slate-800 text-indigo-400 px-2 py-0.5 rounded">${cert.year}</span>
+              </div>
+              <p class="text-xs text-slate-400 mb-2">${cert.issuer}</p>
+            </div>
+            <div class="pt-2 border-t border-slate-800/80 flex justify-end">
+              <button onclick="deleteCert(${cert.id})" class="text-[11px] text-rose-400 hover:text-rose-300">Hapus</button>
+            </div>
+          </div>
+        `;
+        grid.appendChild(card);
+      });
+    }
+
+    function openLightboxCert(url, title, isPdf) {
+      const content = document.getElementById('lightboxContent');
+      
+      const mediaTag = isPdf
+        ? `<div class="p-6 text-center bg-slate-950">
+             <p class="text-sm text-slate-300 mb-4">Pratinjau PDF untuk <strong>${title}</strong></p>
+             <iframe src="${url}" class="w-full h-[65vh] rounded-lg border border-slate-800 bg-white"></iframe>
+             <a href="${url}" download="Sertifikat_${title}.pdf" class="inline-block mt-4 bg-indigo-600 hover:bg-indigo-500 text-white text-xs px-4 py-2 rounded-lg font-medium">📥 Download / Unduh PDF</a>
+           </div>`
+        : `<img src="${url}" class="w-full max-h-[75vh] object-contain bg-black" />
+           <div class="p-4"><h3 class="text-lg font-bold text-white">${title}</h3></div>`;
+
+      content.innerHTML = mediaTag;
+      document.getElementById('lightboxModal').classList.remove('hidden');
+    }
+    
+        function deleteCert(id) {
+      if (!confirm('Hapus sertifikat ini?')) return;
+      certItems = certItems.filter(c => c.id !== id);
+      safeSetItem('portfolio_certs', JSON.stringify(certItems));
+      renderCertificates();
+    }
+
+    // 2. Tambahkan pemanggilan loadCertificates() di baris paling bawah script Anda (bersamaan dengan loadProfile())
+    loadCertificates();
+
+    // Inisialisasi saat halaman dibuka
+    loadProfile();
+    initIndexedDB();
+  </script>
+</body>
+</html>
